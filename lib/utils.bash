@@ -58,11 +58,11 @@ install_version() {
     echo install path is $install_path
     echo download path is $ASDF_DOWNLOAD_PATH
     ls -la $ASDF_DOWNLOAD_PATH
-    cp -R "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+    cp -vR "$ASDF_DOWNLOAD_PATH" "$install_path"
 
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-    test -x "$install_path/bin/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
+    test -x "$install_path/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
 
     echo "$TOOL_NAME $version installation was successful!"
   ) || (
