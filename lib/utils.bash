@@ -58,7 +58,7 @@ install_version() {
     echo install path is $install_path
     echo download path is $ASDF_DOWNLOAD_PATH
     ls -la $ASDF_DOWNLOAD_PATH
-    cp -vR "$ASDF_DOWNLOAD_PATH" "$install_path"
+    cp -vR "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
