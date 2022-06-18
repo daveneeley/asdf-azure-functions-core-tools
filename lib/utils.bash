@@ -13,7 +13,6 @@ fail() {
 
 curl_opts=(-fsSL)
 
-# NOTE: You might want to remove this if azure-functions-core-tools is not hosted on GitHub releases.
 if [ -n "${GITHUB_API_TOKEN:-}" ]; then
   curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
 fi
@@ -33,12 +32,30 @@ list_all_versions() {
   list_github_tags
 }
 
+get_os_artifact_name() {
+  case "$OSTYPE" in
+  darwin*) echo "osx" ;;
+  linux*) echo "linux" ;;
+  *) echo "$OSTYPE" ;;
+  esac
+}
+
+get_system_arch() {
+  archie=$(uname -m)
+  archie=${archie/x86_64/x64}
+  archie=${archie/aarch64/arm64}
+  archie=${archie/armv71/arm32}
+  echo $archie
+}
+
 download_release() {
   local version filename url
   version="$1"
   filename="$2"
+  platform=$(get_os_artifact_name)
+  arch=$(get_system_arch)
 
-  url="$GH_REPO/releases/download/${version}/Azure.Functions.Cli.linux-x64.${version}.zip"
+  url="$GH_REPO/releases/download/${version}/Azure.Functions.Cli.${platform}-${arch}.${version}.zip"
 
   echo "* Downloading $TOOL_NAME release $version..."
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -60,7 +77,7 @@ install_version() {
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     chmod a+x "$install_path/$tool_cmd"
-    test -x "$install_path/$tool_cmd" || fail "Expected $install_path/bin/$tool_cmd to be executable."
+    test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
     echo "$TOOL_NAME $version installation was successful!"
   ) || (
